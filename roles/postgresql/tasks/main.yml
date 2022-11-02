@@ -24,28 +24,6 @@
 # update the listen address so we can access the 
 # service from a remote machine and then change identification to trust
 
-- name: Ensure PostgreSQL is listening on *
-  lineinfile:
-    dest: /etc/postgresql/14/main/postgresql.conf
-    regexp: '^listen_addresses\s*='
-    line: "listen_addresses='*'"
-    state: present
-  notify: Restart Postgresql
-
-- name: Add new configuration to "pg_hba.conf"
-  blockinfile:
-    dest: /etc/postgresql/14/main/pg_hba.conf
-    block: |
-      host    all             all             0.0.0.0/0                md5
-      host    all             all             ::/0                     md5
-  notify: Restart Postgresql
-
-- name: Change peer identification to trust
-  shell: /bin/sed -i '/^local/s/peer/trust/' /etc/postgresql/14/main/pg_hba.conf
-  args:
-    warn: no
-  notify: Restart Postgresql
-
 - name: Create a Superuser PostgreSQL database user
   become: true
   become_user: postgres
